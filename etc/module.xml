@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+
+    Zero Checkout as its own module: disabling it removes the checkout (routes,
+    plugin, blocks); the checkout/zero_checkout/enabled toggle hands checkout back
+    to stock without a deploy. Depends on Zero_Core for shared view models
+    (cookie messages, country/region provider, mini-cart). Card payments plug in
+    from their own modules (Zero_Braintree, Zero_Stripe, Zero_AuthorizeNet), so
+    none of their vendor modules is required here.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Zero_Checkout" setup_version="1.0.0">
+        <sequence>
+            <module name="Zero_Core"/>
+            <module name="Magento_Checkout"/>
+            <module name="Magento_Quote"/>
+            <module name="Magento_Sales"/>
+            <module name="Magento_Customer"/>
+            <module name="Magento_Directory"/>
+            <module name="Magento_Payment"/>
+            <module name="Magento_OfflinePayments"/>
+            <module name="Magento_CheckoutAgreements"/>
+        </sequence>
+    </module>
+</config>

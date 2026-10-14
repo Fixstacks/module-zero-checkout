@@ -1,0 +1,8 @@
+"The payment didn't go through. Your cart is unchanged: try again or choose another payment method.","Оплата не пройшла. Кошик без змін: спробуйте ще раз або оберіть інший спосіб оплати."
+"%1 is processing the payment. The order will be updated when it is done.","%1 обробляє оплату. Замовлення оновиться, щойно вона завершиться."
+"We are waiting for %1 to confirm the payment. The order will be updated when it does.","Чекаємо підтвердження оплати від %1. Замовлення оновиться, щойно воно надійде."
+"Company","Компанія"
+"VAT Number","Номер платника ПДВ"
+"Valid EU VAT number (VIES).","Дійсний номер платника ПДВ ЄС (VIES)."
+"VIES doesn't know this VAT number. Check it, with or without the country prefix.","VIES не знає цього номера платника ПДВ. Перевірте його, з префіксом країни чи без."
+"VIES can't be reached right now: the number will be checked with the order.","VIES зараз недоступний: номер перевіримо разом із замовленням."

@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+
+    Zero Checkout page. layout="1column" must be the page attribute (not an
+    <update handle>): the page layout decides which containers exist before the
+    body references run. The block is cacheable="false" — it renders the live quote.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template" name="zero.checkout.index"
+                   template="Zero_Checkout::checkout/index.phtml" cacheable="false">
+                <arguments>
+                    <argument name="viewModel" xsi:type="object">Zero\Checkout\ViewModel\Checkout\CheckoutPage</argument>
+                </arguments>
+                <!--
+                    Payment-step extension points (index.phtml renders them via getChildHtml()).
+                    No htmlTag on purpose: their blocks must end up as direct siblings of
+                    #payment-methods, because each card panel is shown by a
+                    `#payment-methods:has(...) ~ #panel` rule in the theme's components.css.
+                    Payment modules add their own blocks here (Zero_Braintree, Zero_Stripe,
+                    Zero_AuthorizeNet).
+                -->
+                <!-- Guests only: "Already have an account? Sign in", above the checkout form. -->
+                <block class="Magento\Framework\View\Element\Template" name="zero.checkout.login"
+                       template="Zero_Checkout::checkout/login.phtml">
+                    <arguments>
+                        <argument name="viewModel" xsi:type="object">Zero\Checkout\ViewModel\Checkout\CheckoutPage</argument>
+                    </arguments>
+                </block>
+                <!-- Order summary, between the items and the totals. -->
+                <container name="zero.checkout.summary.totals.before" label="Zero Checkout: order summary, above the totals">
+                    <block class="Magento\Framework\View\Element\Template" name="zero.checkout.coupon"
+                           template="Zero_Checkout::checkout/coupon.phtml">
+                        <arguments>
+                            <argument name="viewModel" xsi:type="object">Zero\Checkout\ViewModel\Checkout\CheckoutPage</argument>
+                        </arguments>
+                    </block>
+                </container>
+                <!--
+                    Inside the checkout form, right above Place Order: fields here are posted
+                    with the order, so a module adds a field here and reads it in its own
+                    PlaceOrderValidatorInterface / AfterPlaceOrderInterface (see README.md).
+                -->
+                <container name="zero.checkout.place-order.before" label="Zero Checkout: above Place Order">
+                    <block class="Magento\Framework\View\Element\Template" name="zero.checkout.order-comment"
+                           template="Zero_Checkout::checkout/order-comment.phtml">
+                        <arguments>
+                            <argument name="viewModel" xsi:type="object">Zero\Checkout\ViewModel\Checkout\CheckoutPage</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Framework\View\Element\Template" name="zero.checkout.agreements"
+                           template="Zero_Checkout::checkout/agreements.phtml">
+                        <arguments>
+                            <argument name="agreementsViewModel" xsi:type="object">Zero\Checkout\ViewModel\Checkout\Agreements</argument>
+                        </arguments>
+                    </block>
+                </container>
+                <!--
+                    Right after the shipping rates, inside the form: a carrier's own fields
+                    (Zero_NovaPoshta: city and branch). No htmlTag: its blocks are siblings of
+                    #shipping-methods, so `#shipping-methods:has(...) ~ .panel` can show one
+                    only while its rate is picked.
+                -->
+                <container name="zero.checkout.shipping.after" label="Zero Checkout: after the shipping methods"/>
+                <container name="zero.checkout.payment.express" label="Zero Checkout: above payment methods"/>
+                <container name="zero.checkout.payment.forms" label="Zero Checkout: payment method forms">
+                    <block class="Magento\Framework\View\Element\Template" name="zero.checkout.payment.purchaseorder"
+                           template="Zero_Checkout::checkout/payment/purchaseorder.phtml">
+                        <arguments>
+                            <argument name="viewModel" xsi:type="object">Zero\Checkout\ViewModel\Checkout\CheckoutPage</argument>
+                        </arguments>
+                    </block>
+                </container>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

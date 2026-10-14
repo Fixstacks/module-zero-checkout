@@ -1,0 +1,11 @@
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * Picked up by the Zero theme build (scripts/collect-module-styles.mjs)
+ * while Zero_Checkout is enabled: Tailwind builds the classes its templates use.
+ */
+@source "../templates/**/*.phtml";
+
+/* Added by web/js/checkout-steps.js, not in any template. */
+@source inline("step-primary");

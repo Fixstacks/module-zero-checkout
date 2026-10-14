@@ -1,0 +1,23 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * #vat-check's content (Controller\Checkout\Vat): what VIES said of the VAT
+ * number. Empty when there was nothing to check.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$status = (string) $block->getData('status');
+$messages = [
+    'valid' => ['text-success', __('Valid EU VAT number (VIES).')],
+    'invalid' => ['text-error', __('VIES doesn\'t know this VAT number. Check it, with or without the country prefix.')],
+    'unavailable' => ['text-base-content/70', __('VIES can\'t be reached right now: the number will be checked with the order.')],
+];
+if (!isset($messages[$status])) {
+    return;
+}
+[$class, $message] = $messages[$status];
+?>
+<p class="<?= /* @noEscape */ $class ?>" data-vat-status="<?= $escaper->escapeHtmlAttr($status) ?>"><?= $escaper->escapeHtml($message) ?></p>

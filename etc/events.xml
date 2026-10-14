@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+
+    Global scope on purpose: the observer must also apply to REST/GraphQL checkouts.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="payment_method_is_active">
+        <observer name="zero_checkout_hide_zero_payment_methods_on_stock_checkout"
+                  instance="Zero\Checkout\Observer\HideZeroPaymentMethodsOnStockCheckout"/>
+    </event>
+</config>

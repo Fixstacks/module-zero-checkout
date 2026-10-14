@@ -1,0 +1,55 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * Shipping rate radio list (#shipping-methods), rendered inline and as the
+ * zero/checkout/shippingmethods response; `isOob` renders it as an hx-swap-oob
+ * fragment (used by Controller\Checkout\Address).
+ *
+ * Each radio hx-gets the endpoint itself on change, so the server learns the
+ * choice immediately. Relying on a later address-field request was racy: a
+ * field's blur-triggered change can fire with the old radio still checked.
+ * hx-sync matches the address fields' group so the newest request wins.
+ *
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Zero\Checkout\ViewModel\Checkout\CheckoutPage $viewModel
+ */
+$viewModel = $block->getData('viewModel');
+$rates = $viewModel->getAvailableShippingRates();
+$selected = $viewModel->getSelectedShippingMethod();
+$shippingMethodsUrl = $escaper->escapeUrl($block->getUrl('zero/checkout/shippingmethods'));
+$isOob = (bool) $block->getData('isOob');
+?>
+<div id="shipping-methods" class="flex flex-col gap-2"<?= $isOob ? ' hx-swap-oob="true"' : '' ?>>
+    <?php if (empty($rates)) : ?>
+        <p class="text-sm text-base-content/60">
+            <?= $escaper->escapeHtml(__('Enter a complete address above to see shipping options.')) ?>
+        </p>
+    <?php else : ?>
+        <?php foreach ($rates as $rate) : ?>
+            <?php
+            $code = $rate->getCode();
+            $title = trim($rate->getCarrierTitle() . ' - ' . $rate->getMethodTitle(), ' -');
+            $isFirst = $rates[array_key_first($rates)] === $rate;
+            $isChecked = $selected ? $selected === $code : $isFirst;
+            ?>
+            <label class="flex items-center justify-between gap-3 rounded-field border border-base-300 px-4 py-3 cursor-pointer has-[:checked]:border-base-content has-[:checked]:bg-base-200/60">
+                <span class="flex items-center gap-3">
+                    <input type="radio" name="shipping_method" value="<?= $escaper->escapeHtmlAttr($code) ?>"
+                           class="radio radio-sm"
+                           hx-get="<?= /* @noEscape */ $shippingMethodsUrl ?>"
+                           hx-trigger="change" hx-target="#shipping-methods" hx-swap="outerHTML"
+                           hx-include="closest form" hx-sync="#shipping-methods:replace"
+                        <?= $isChecked ? 'checked' : '' ?> />
+                    <span class="text-sm"><?= $escaper->escapeHtml($title) ?></span>
+                </span>
+                <span class="text-sm font-medium">
+                    <?= $rate->getPrice() > 0
+                        ? $escaper->escapeHtml($viewModel->getFormattedPrice((float) $rate->getPrice()))
+                        : $escaper->escapeHtml(__('Free')) ?>
+                </span>
+            </label>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>

@@ -1,0 +1,57 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * Subtotal / Shipping / Discount / other modules' totals (a gift card) / Total
+ * of the order summary, rendered inline and as an hx-swap-oob fragment with
+ * every shipping-rate refresh, so the total shown always matches what Place
+ * Order will charge.
+ *
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Zero\Checkout\ViewModel\Checkout\CheckoutPage $viewModel
+ */
+$viewModel = $block->getData('viewModel');
+$isOob = (bool) $block->getData('isOob');
+?>
+<div id="order-summary-totals" class="flex flex-col gap-2 border-t border-base-300 pt-3 text-sm"
+    <?= $isOob ? 'hx-swap-oob="true"' : '' ?>>
+    <div class="flex items-center justify-between">
+        <span class="text-base-content/70"><?= $escaper->escapeHtml(__('Subtotal')) ?></span>
+        <span><?= $escaper->escapeHtml($viewModel->getFormattedSubtotal()) ?></span>
+    </div>
+    <?php if ($viewModel->getFormattedShippingAmount()) : ?>
+        <div class="flex items-center justify-between">
+            <span class="text-base-content/70"><?= $escaper->escapeHtml(__('Shipping')) ?></span>
+            <span><?= $escaper->escapeHtml($viewModel->getFormattedShippingAmount()) ?></span>
+        </div>
+    <?php endif; ?>
+    <?php if ($viewModel->getFormattedDiscountAmount()) : ?>
+        <div class="flex items-center justify-between">
+            <span class="text-base-content/70"><?= $escaper->escapeHtml(__('Discount')) ?></span>
+            <span class="text-success"><?= $escaper->escapeHtml($viewModel->getFormattedDiscountAmount()) ?></span>
+        </div>
+    <?php endif; ?>
+    <?php foreach ($viewModel->getExtraTotals() as $total) : ?>
+        <div class="flex items-center justify-between" data-total="<?= $escaper->escapeHtmlAttr($total['code']) ?>">
+            <span class="text-base-content/70"><?= $escaper->escapeHtml($total['title']) ?></span>
+            <span class="text-success"><?= $escaper->escapeHtml($total['value']) ?></span>
+        </div>
+    <?php endforeach; ?>
+    <div class="flex items-center justify-between font-semibold text-base border-t border-base-300 pt-2 mt-1">
+        <span><?= $escaper->escapeHtml(__('Total')) ?></span>
+        <strong><?= $escaper->escapeHtml($viewModel->getFormattedGrandTotal()) ?></strong>
+    </div>
+</div>
+<?php
+// Out of band, the payment choices follow when there is nothing to pay, or
+// when the page still shows that (the request's payment_list_mode).
+$request = $block->getRequest();
+if ($isOob && ($viewModel->isNothingToPay() || $request->getParam('payment_list_mode') === 'free')) {
+    echo $block->getLayout()
+        ->createBlock(\Magento\Framework\View\Element\Template::class)
+        ->setTemplate('Zero_Checkout::checkout/payment-methods.phtml')
+        ->setData(['viewModel' => $viewModel, 'isOob' => true, 'selected' => (string) $request->getParam('payment_method')])
+        ->toHtml();
+}
+?>

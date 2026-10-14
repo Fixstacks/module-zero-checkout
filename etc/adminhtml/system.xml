@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+
+    Stores > Configuration > Zero > Checkout > Enabled — runtime switch between
+    Zero Checkout and stock checkout (Model\Config, Plugin\Checkout\RedirectLegacyCheckout).
+    Stored under checkout/zero_checkout/enabled (config_path), its original location.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="zero_checkout" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Checkout</label>
+            <tab>zero</tab>
+            <resource>Zero_Checkout::config</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Zero Checkout</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Enabled</label>
+                    <comment>
+                        Yes (default): "Proceed to Checkout" and /checkout/ go to Zero Checkout.
+                        No: Magento's stock checkout is used instead; Braintree and offline payment
+                        methods work there, Stripe/Authorize.Net/PayPal Standard (Zero) are hidden.
+                    </comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>checkout/zero_checkout/enabled</config_path>
+                </field>
+            </group>
+            <group id="features" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Checkout Page</label>
+                <depends>
+                    <field id="zero_checkout/general/enabled">1</field>
+                </depends>
+                <field id="layout" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Layout</label>
+                    <comment>One page shows everything at once. Steps shows contact and addresses, then the shipping method, then payment, one at a time, with the order summary alongside; each step's fields are checked before the next. Without JavaScript the steps fall back to one page.</comment>
+                    <source_model>Zero\Checkout\Model\Config\Source\Layout</source_model>
+                    <config_path>checkout/zero_checkout/layout</config_path>
+                </field>
+                <field id="address_autocomplete" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Address Autocomplete</label>
+                    <comment><![CDATA[Suggests addresses as the shopper types the street; picking one fills street, city, region and postcode. Looked up by the server: no third-party script on the page, the key never reaches the browser. <strong>Google Places</strong>: needs an API key with Places API (New); fast. <strong>Photon</strong>: OpenStreetMap, no key, open source; run your own server for real traffic (the public one can take seconds per answer).]]></comment>
+                    <source_model>Zero\Checkout\Model\Config\Source\AddressAutocomplete</source_model>
+                    <config_path>checkout/zero_checkout/address_autocomplete</config_path>
+                </field>
+                <field id="photon_url" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Photon Server URL</label>
+                    <comment>The /api/ endpoint of a Photon server (github.com/komoot/photon).</comment>
+                    <validate>validate-url</validate>
+                    <config_path>checkout/zero_checkout/photon_url</config_path>
+                    <depends>
+                        <field id="address_autocomplete">photon</field>
+                    </depends>
+                </field>
+                <field id="google_places_api_key" translate="label" type="obscure" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Google Places API Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <config_path>checkout/zero_checkout/google_places_api_key</config_path>
+                    <depends>
+                        <field id="address_autocomplete">google</field>
+                    </depends>
+                </field>
+                <field id="coupon" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Discount Code Field</label>
+                    <comment>"Have a discount code?" in the order summary. The cart page's discount box is independent of this.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>checkout/zero_checkout/coupon</config_path>
+                </field>
+                <field id="order_comment" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Order Comment</label>
+                    <comment>Optional note from the shopper (up to 1000 characters). Saved on the order: Comments History in the admin order view, and the order page in the customer's account.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>checkout/zero_checkout/order_comment</config_path>
+                </field>
+                <field id="login" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Sign In at Checkout</label>
+                    <comment>"Already have an account? Sign in" for guests. Uses Magento's own sign-in (captcha, lockout, cart merge) and returns to checkout with the saved addresses.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>checkout/zero_checkout/login</config_path>
+                </field>
+            </group>
+            <group id="agreements" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Terms and Conditions</label>
+                <field id="enable_agreements" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Terms and Conditions</label>
+                    <comment>Magento's own setting (also under Sales > Checkout > Checkout Options). The agreements themselves are edited in Stores > Terms and Conditions; "Manually" ones become required checkboxes above Place Order, checked again on the server.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>checkout/options/enable_agreements</config_path>
+                </field>
+            </group>
+            <group id="payment_methods" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Payment Methods</label>
+                <comment>Payment methods are set up where Magento keeps them: Sales > Payment Methods (Stripe, Braintree, Authorize.Net and PayPal for Zero Checkout are there too).</comment>
+            </group>
+        </section>
+    </system>
+</config>

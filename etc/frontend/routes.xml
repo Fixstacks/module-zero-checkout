@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+
+    Adds this module to Zero_Core's existing "zero" route (same frontName): the
+    router tries every module registered for a route id, so zero/checkout/* URLs
+    stay unchanged.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+    <router id="standard">
+        <route id="zero" frontName="zero">
+            <module name="Zero_Checkout" before="Zero_Core"/>
+        </route>
+    </router>
+</config>

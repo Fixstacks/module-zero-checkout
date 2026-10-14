@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+
+    Response of Controller\Checkout\CreateAccount when the account can't be
+    made: the success page's account prompt again, with the reason.
+-->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <body>
+        <block class="Magento\Checkout\Block\Registration" name="checkout.registration" cacheable="false"
+               template="Magento_Checkout::registration.phtml"/>
+    </body>
+</layout>

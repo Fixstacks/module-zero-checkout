@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Redirects stock /checkout/ to Zero Checkout while it's enabled (see the plugin's docblock). -->
+    <type name="Magento\Checkout\Controller\Index\Index">
+        <plugin name="zero_checkout_redirect_legacy_checkout" type="Zero\Checkout\Plugin\Checkout\RedirectLegacyCheckout"/>
+    </type>
+    <!--
+        Place-order extension points (Api/PlaceOrderValidatorInterface,
+        Api/AfterPlaceOrderInterface). Other modules add items to the same arrays
+        in their own di.xml; keys are names, so a module can also replace or
+        remove one of these.
+    -->
+    <type name="Zero\Checkout\Controller\Checkout\Placeorder">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="agreements" xsi:type="object">Zero\Checkout\Model\PlaceOrder\AgreementsValidator</item>
+                <item name="order_comment" xsi:type="object">Zero\Checkout\Model\PlaceOrder\OrderComment</item>
+            </argument>
+            <argument name="afterPlaceOrder" xsi:type="array">
+                <item name="order_comment" xsi:type="object">Zero\Checkout\Model\PlaceOrder\OrderComment</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Zero\Checkout\Model\AddressLookup\Pool">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="photon" xsi:type="object">Zero\Checkout\Model\AddressLookup\Photon</item>
+                <item name="google" xsi:type="object">Zero\Checkout\Model\AddressLookup\Google</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

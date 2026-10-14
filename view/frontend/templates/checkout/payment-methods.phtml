@@ -1,0 +1,42 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * The payment method choices (#payment-methods). Re-rendered out of band with
+ * the order summary totals when there is nothing left to pay (only "No
+ * Payment Information Required") and when that changes back
+ * (payment_list_mode tells which the page shows). The method posted as
+ * `payment_method` stays chosen.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Zero\Checkout\ViewModel\Checkout\CheckoutPage $viewModel
+ */
+$viewModel = $block->getData('viewModel');
+$isOob = (bool) $block->getData('isOob');
+$methods = $viewModel->getPaymentMethodsToList();
+$codes = array_map(static fn ($method) => $method->getCode(), $methods);
+$selected = (string) $block->getData('selected');
+$selected = in_array($selected, $codes, true) ? $selected : ($codes[0] ?? '');
+?>
+<div class="flex flex-col gap-2" id="payment-methods"<?= $isOob ? ' hx-swap-oob="true"' : '' ?>>
+    <input type="hidden" name="payment_list_mode" value="<?= $viewModel->isNothingToPay() ? 'free' : 'all' ?>">
+    <?php foreach ($methods as $method) : ?>
+        <?php
+        $code = $method->getCode();
+        $description = $viewModel->getPaymentDescription($code);
+        ?>
+        <label class="flex flex-col gap-1 rounded-field border border-base-300 px-4 py-3 cursor-pointer has-[:checked]:border-base-content has-[:checked]:bg-base-200/60">
+            <span class="flex items-center gap-3">
+                <input type="radio" name="payment_method" value="<?= $escaper->escapeHtmlAttr($code) ?>"
+                       class="radio radio-sm"
+                    <?= $code === $selected ? 'checked' : '' ?> />
+                <span class="text-sm font-medium"><?= $escaper->escapeHtml($method->getTitle()) ?></span>
+            </span>
+            <?php if ($description !== '') : ?>
+                <span class="text-xs text-base-content/60 ps-7"><?= $escaper->escapeHtml($description) ?></span>
+            <?php endif; ?>
+        </label>
+    <?php endforeach; ?>
+</div>

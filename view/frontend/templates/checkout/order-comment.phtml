@@ -1,0 +1,29 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * Optional note to the store (Stores > Configuration > Zero > Checkout > Order
+ * Comment). Posted with the order as `order_comment`; Model\PlaceOrder\
+ * OrderComment checks its length and saves it on the order.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Zero\Checkout\ViewModel\Checkout\CheckoutPage $viewModel
+ */
+$viewModel = $block->getData('viewModel');
+if (!$viewModel->isOrderCommentEnabled()) {
+    return;
+}
+$maxLength = \Zero\Checkout\Model\PlaceOrder\OrderComment::MAX_LENGTH;
+?>
+<details class="checkout-order-comment mt-4 text-sm">
+    <summary class="cursor-pointer underline underline-offset-2">
+        <?= $escaper->escapeHtml(__('Add a note to your order')) ?>
+    </summary>
+    <label class="sr-only" for="order-comment"><?= $escaper->escapeHtml(__('Order comment')) ?></label>
+    <textarea name="order_comment" id="order-comment" rows="3"
+              maxlength="<?= (int) $maxLength ?>"
+              placeholder="<?= $escaper->escapeHtmlAttr(__('Delivery instructions, gift message, anything we should know.')) ?>"
+              class="textarea textarea-bordered w-full mt-2 text-sm"></textarea>
+</details>

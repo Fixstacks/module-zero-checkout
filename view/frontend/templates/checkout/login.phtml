@@ -1,0 +1,44 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * "Already have an account? Sign in" for guests, above the checkout form
+ * (Stores > Configuration > Zero > Checkout > Sign In at Checkout). Its own
+ * <form>, outside the checkout one, posting to zero/checkout/login, which
+ * hands over to core's customer/account/loginPost (captcha, lockout, cart
+ * merge) and brings the shopper back here signed in.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Zero\Checkout\ViewModel\Checkout\CheckoutPage $viewModel
+ */
+$viewModel = $block->getData('viewModel');
+if (!$viewModel->isGuest() || !$viewModel->isLoginEnabled()) {
+    return;
+}
+?>
+<details class="checkout-login mb-6 border border-base-300 bg-base-100 px-4 py-3 text-sm">
+    <summary class="cursor-pointer">
+        <?= $escaper->escapeHtml(__('Already have an account?')) ?>
+        <span class="underline underline-offset-2 font-semibold"><?= $escaper->escapeHtml(__('Sign in')) ?></span>
+        <span class="text-base-content/60"><?= $escaper->escapeHtml(__('to use your saved addresses.')) ?></span>
+    </summary>
+    <form method="post" action="<?= $escaper->escapeUrl($block->getUrl('zero/checkout/login')) ?>"
+          class="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end mt-3" id="checkout-login-form">
+        <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($viewModel->getFormKey()) ?>" />
+        <div class="field">
+            <label class="label" for="checkout-login-email"><?= $escaper->escapeHtml(__('Email')) ?></label>
+            <input type="email" name="login[username]" id="checkout-login-email" required
+                   autocomplete="username" inputmode="email" class="input input-bordered w-full" />
+        </div>
+        <div class="field">
+            <label class="label" for="checkout-login-password"><?= $escaper->escapeHtml(__('Password')) ?></label>
+            <input type="password" name="login[password]" id="checkout-login-password" required
+                   autocomplete="current-password" class="input input-bordered w-full" />
+        </div>
+        <button type="submit" class="btn btn-neutral"><?= $escaper->escapeHtml(__('Sign In')) ?></button>
+        <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/forgotpassword')) ?>"
+           class="text-xs underline underline-offset-2 sm:col-span-3"><?= $escaper->escapeHtml(__('Forgot your password?')) ?></a>
+    </form>
+</details>

@@ -1,0 +1,58 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * Terms and Conditions above Place Order (ViewModel\Checkout\Agreements).
+ * Manual agreements are required checkboxes named agreement_ids[]; the server
+ * re-checks them (Model\PlaceOrder\AgreementsValidator). Automatic ones are a
+ * one-line notice. Each agreement's text opens in a native <details>; its
+ * content is admin-authored, rendered as HTML when the agreement says so
+ * (as stock checkout does), otherwise escaped.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Zero\Checkout\ViewModel\Checkout\Agreements $agreementsViewModel
+ */
+$agreementsViewModel = $block->getData('agreementsViewModel');
+$agreements = $agreementsViewModel->getAgreements();
+?>
+<?php if ($agreements): ?>
+    <div class="checkout-agreements flex flex-col gap-3 mt-4 text-sm" id="checkout-agreements">
+        <?php foreach ($agreements as $agreement): ?>
+            <?php
+            $agreementId = (int) $agreement->getAgreementId();
+            $label = (string) ($agreement->getCheckboxText() ?: $agreement->getName());
+            ?>
+            <div class="checkout-agreement">
+                <?php if ($agreementsViewModel->isManual($agreement)): ?>
+                    <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="checkbox" name="agreement_ids[]" required
+                               value="<?= (int) $agreementId ?>"
+                               id="agreement-<?= (int) $agreementId ?>"
+                               class="checkbox checkbox-sm mt-0.5" />
+                        <span><?= $escaper->escapeHtml($label, ['a', 'b', 'strong', 'em']) ?></span>
+                    </label>
+                <?php else: ?>
+                    <p class="text-base-content/70">
+                        <?= $escaper->escapeHtml(__('By placing your order you agree to: %1', $label)) ?>
+                    </p>
+                <?php endif; ?>
+                <?php if ((string) $agreement->getContent() !== ''): ?>
+                    <details class="mt-1 ps-6">
+                        <summary class="cursor-pointer text-xs underline underline-offset-2 text-base-content/70">
+                            <?= $escaper->escapeHtml(__('Read %1', $agreement->getName())) ?>
+                        </summary>
+                        <div class="checkout-agreement-content mt-2 max-h-48 overflow-y-auto border border-base-300 p-3 text-xs">
+                            <?php if ($agreement->getIsHtml()): ?>
+                                <?= /* @noEscape */ $agreement->getContent() ?>
+                            <?php else: ?>
+                                <?= /* @noEscape */ nl2br($escaper->escapeHtml((string) $agreement->getContent())) ?>
+                            <?php endif; ?>
+                        </div>
+                    </details>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>

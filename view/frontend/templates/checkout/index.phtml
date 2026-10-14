@@ -1,0 +1,221 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * Zero Checkout: one page, one native <form> posting address, shipping method
+ * and payment to zero/checkout/placeorder. HTMX only refreshes small regions
+ * (regions select, shipping rates + totals, saved-address picker); there is no
+ * client-side checkout state.
+ *
+ * Extension containers (zero_checkout_index.xml): zero.checkout.login (above
+ * the form), zero.checkout.shipping.after (right after the shipping rates, as
+ * their siblings), zero.checkout.summary.totals.before (coupon) and
+ * zero.checkout.place-order.before (order comment, Terms and Conditions; its
+ * fields post with the order).
+ *
+ * Layout (lg+): addresses | shipping + payment | order summary (sticky; the
+ * aside stretches to the row so it has room to stick). The page title comes
+ * from the layout; section headings use the sans face like other forms. Payment-method
+ * forms come from the zero.checkout.payment.express / .forms containers (see
+ * zero_checkout_index.xml); card panels toggle via CSS :has() on
+ * #payment-methods, so they must stay its siblings.
+ *
+ * Address fields wired to #shipping-methods share hx-sync="#shipping-methods:
+ * replace" so a newer edit aborts an older in-flight request (a slow response
+ * could otherwise overwrite newer rates and the picked method). The region
+ * field fires on zero:session-ready rather than load, so a first-time visitor's
+ * session exists before rates are computed against its quote.
+ *
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Zero\Checkout\ViewModel\Checkout\CheckoutPage $viewModel
+ */
+$viewModel = $block->getData('viewModel');
+$steps = $viewModel->isStepLayout();
+// Step layout: data-step marks each section's step; Zero_Checkout::js/checkout-steps.js
+// shows one step at a time. Without it every step shows, as on one page.
+$step = static fn (int $n): string => $steps ? ' data-step="' . $n . '"' : '';
+$stepNames = [1 => __('Address'), 2 => __('Shipping'), 3 => __('Payment')];
+?>
+<div class="checkout-index">
+    <?= $block->getChildHtml('zero.checkout.login') ?>
+
+    <form id="checkout-form" method="post"
+          action="<?= $escaper->escapeUrl($block->getUrl('zero/checkout/placeorder')) ?>"
+          <?= $steps ? 'data-checkout-steps' : '' ?>
+          class="grid grid-cols-1 <?= $steps ? 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]' : 'lg:grid-cols-3' ?> gap-8 items-start">
+        <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($viewModel->getFormKey()) ?>" />
+
+        <?php if ($steps) : ?>
+            <nav class="lg:col-start-1" aria-label="<?= $escaper->escapeHtmlAttr(__('Checkout steps')) ?>" data-step-nav hidden>
+                <ol class="steps w-full">
+                    <?php foreach ($stepNames as $n => $name) : ?>
+                        <li class="step" data-step-item="<?= (int) $n ?>">
+                            <button type="button" class="link link-hover" data-step-goto="<?= (int) $n ?>">
+                                <?= $escaper->escapeHtml($name) ?>
+                            </button>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            </nav>
+        <?php endif; ?>
+
+        <div class="flex flex-col gap-8<?= $steps ? ' lg:col-start-1' : '' ?>">
+            <?php if ($viewModel->isGuest()) : ?>
+                <section class="fieldset"<?= /* @noEscape */ $step(1) ?>>
+                    <h2 class="text-lg font-semibold mb-3"><?= $escaper->escapeHtml(__('Contact')) ?></h2>
+                    <div class="field required">
+                        <label class="label" for="email"><?= $escaper->escapeHtml(__('Email')) ?></label>
+                        <input type="email" name="email" id="email" required autocomplete="email" inputmode="email"
+                               value="<?= $escaper->escapeHtmlAttr($viewModel->getCustomerEmail()) ?>"
+                               class="input input-bordered w-full" />
+                    </div>
+                </section>
+            <?php endif; ?>
+
+            <section class="fieldset"<?= /* @noEscape */ $step(1) ?>>
+                <h2 class="text-lg font-semibold mb-3"><?= $escaper->escapeHtml(__('Shipping Address')) ?></h2>
+                <?php
+                /*
+                 * Saved-address picker (logged-in customers with an address book only).
+                 * Picking one hits Controller\Checkout\Address, which re-renders the
+                 * address fields plus rates/totals (hx-swap-oob). Named so hx-include sends
+                 * it; Placeorder ignores the extra key.
+                 */
+                $savedAddresses = $viewModel->getSavedAddresses();
+                ?>
+                <?php if (!empty($savedAddresses)) : ?>
+                    <div class="field mb-4">
+                        <label class="label" for="saved-address-picker"><?= $escaper->escapeHtml(__('Use a saved address')) ?></label>
+                        <select id="saved-address-picker" name="saved_address_id"
+                                hx-get="<?= $escaper->escapeUrl($block->getUrl('zero/checkout/address')) ?>"
+                                hx-trigger="change" hx-target="#shipping-address-fields" hx-swap="outerHTML"
+                                hx-include="this" hx-sync="#shipping-methods:replace"
+                                class="select select-bordered w-full">
+                            <option value=""><?= $escaper->escapeHtml(__('Enter a new address')) ?></option>
+                            <?php foreach ($savedAddresses as $savedAddress) : ?>
+                                <option value="<?= (int) $savedAddress['id'] ?>">
+                                    <?= $escaper->escapeHtml($savedAddress['label']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                <?php endif; ?>
+                <?= $block->getLayout()
+                    ->createBlock(\Magento\Framework\View\Element\Template::class)
+                    ->setTemplate('Zero_Checkout::checkout/shipping-address-fields.phtml')
+                    ->setData('viewModel', $viewModel)
+                    ->toHtml() ?>
+            </section>
+
+            <?php
+            /*
+             * Billing: "Same as shipping" (default checked) hides #billing-fields via
+             * CSS :has() — no JS. The hidden value="0" + checkbox value="1" pair makes an
+             * unchecked box post "0" (PHP keeps the last duplicate key) instead of
+             * nothing. #billing-fields must not carry a bare `grid`/`flex` class:
+             * Tailwind's later utilities layer would beat the components-layer
+             * display:none and show it permanently.
+             */
+            ?>
+            <section class="fieldset"<?= /* @noEscape */ $step(1) ?>>
+                <h2 class="text-lg font-semibold mb-3"><?= $escaper->escapeHtml(__('Billing Address')) ?></h2>
+                <div id="billing-toggle" class="mb-4">
+                    <label class="label cursor-pointer justify-start gap-2">
+                        <input type="hidden" name="billing_same_as_shipping" value="0" />
+                        <input type="checkbox" id="billing-same-as-shipping" name="billing_same_as_shipping"
+                               value="1" checked class="checkbox checkbox-sm" />
+                        <span class="label-text"><?= $escaper->escapeHtml(__('Same as shipping address')) ?></span>
+                    </label>
+                </div>
+                <?= $block->getLayout()
+                    ->createBlock(\Magento\Framework\View\Element\Template::class)
+                    ->setTemplate('Zero_Checkout::checkout/billing-address-fields.phtml')
+                    ->setData('viewModel', $viewModel)
+                    ->toHtml() ?>
+            </section>
+            <?php if ($steps) : ?>
+                <div data-step="1" data-step-controls hidden>
+                    <button type="button" class="btn btn-primary" data-step-next><?= $escaper->escapeHtml(__('Continue to Shipping')) ?></button>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <div class="flex flex-col gap-8<?= $steps ? ' lg:col-start-1' : '' ?>">
+            <section class="fieldset"<?= /* @noEscape */ $step(2) ?>>
+                <h2 class="text-lg font-semibold mb-3"><?= $escaper->escapeHtml(__('Shipping Method')) ?></h2>
+                <?= $block->getLayout()
+                    ->createBlock(\Magento\Framework\View\Element\Template::class)
+                    ->setTemplate('Zero_Checkout::checkout/shipping-methods.phtml')
+                    ->setData('viewModel', $viewModel)
+                    ->toHtml() ?>
+                <?= $block->getChildHtml('zero.checkout.shipping.after') ?>
+            </section>
+            <?php if ($steps) : ?>
+                <div class="flex gap-3" data-step="2" data-step-controls hidden>
+                    <button type="button" class="btn btn-ghost" data-step-back><?= $escaper->escapeHtml(__('Back')) ?></button>
+                    <button type="button" class="btn btn-primary" data-step-next><?= $escaper->escapeHtml(__('Continue to Payment')) ?></button>
+                </div>
+            <?php endif; ?>
+
+            <section class="fieldset"<?= /* @noEscape */ $step(3) ?>>
+                <h2 class="text-lg font-semibold mb-3"><?= $escaper->escapeHtml(__('Payment Method')) ?></h2>
+                <?= $block->getChildHtml('zero.checkout.payment.express') ?>
+
+                <?= $block->getLayout()
+                    ->createBlock(\Magento\Framework\View\Element\Template::class)
+                    ->setTemplate('Zero_Checkout::checkout/payment-methods.phtml')
+                    ->setData('viewModel', $viewModel)
+                    ->toHtml() ?>
+
+                <?= $block->getChildHtml('zero.checkout.payment.forms') ?>
+            </section>
+            <?php if ($steps) : ?>
+                <div data-step="3" data-step-controls hidden>
+                    <button type="button" class="btn btn-ghost" data-step-back><?= $escaper->escapeHtml(__('Back')) ?></button>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <aside class="lg:self-stretch<?= $steps ? ' lg:col-start-2 lg:row-start-1 lg:row-span-3' : '' ?>">
+            <div class="rounded-box border border-base-300 bg-base-100 p-5 lg:sticky lg:top-4">
+                <div class="flex items-baseline justify-between gap-4 mb-4">
+                    <h2 class="text-lg font-semibold"><?= $escaper->escapeHtml(__('Order Summary')) ?></h2>
+                    <a href="<?= $escaper->escapeUrl($block->getUrl('checkout/cart')) ?>"
+                       class="text-sm underline underline-offset-2"><?= $escaper->escapeHtml(__('Edit cart')) ?></a>
+                </div>
+                <ul class="flex flex-col gap-3 mb-4 max-h-80 overflow-y-auto">
+                    <?php foreach ($viewModel->getItems() as $item) : ?>
+                        <li class="flex items-start justify-between gap-2 text-sm">
+                            <span class="flex-1 min-w-0">
+                                <?= $escaper->escapeHtml($item->getName()) ?>
+                                <span class="text-base-content/60">&times;<?= (float) $item->getQty() ?></span>
+                                <?php foreach ($viewModel->getItemOptions($item) as $option) : ?>
+                                    <span class="block text-xs text-base-content/60">
+                                        <?= $escaper->escapeHtml($option['label']) ?>: <?= $escaper->escapeHtml($option['value']) ?>
+                                    </span>
+                                <?php endforeach; ?>
+                            </span>
+                            <span class="font-medium whitespace-nowrap">
+                                <?= $escaper->escapeHtml($viewModel->getFormattedItemPrice($item)) ?>
+                            </span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+                <?= $block->getChildHtml('zero.checkout.summary.totals.before') ?>
+                <?= $block->getLayout()
+                    ->createBlock(\Magento\Framework\View\Element\Template::class)
+                    ->setTemplate('Zero_Checkout::checkout/order-summary-totals.phtml')
+                    ->setData('viewModel', $viewModel)
+                    ->toHtml() ?>
+                <?= $block->getChildHtml('zero.checkout.place-order.before') ?>
+                <button type="submit" class="btn btn-primary w-full mt-5"<?= $steps ? ' data-step-final' : '' ?>>
+                    <?= $escaper->escapeHtml(__('Place Order')) ?>
+                </button>
+            </div>
+        </aside>
+    </form>
+    <?php if ($steps) : ?>
+        <script src="<?= $escaper->escapeUrl($block->getViewFileUrl('Zero_Checkout::js/checkout-steps.js')) ?>" defer></script>
+    <?php endif; ?>
+</div>

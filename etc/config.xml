@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+
+    Defaults for Stores > Configuration > Zero > Checkout. Without a default,
+    isSetFlag() reads an unsaved path as false (a fresh install would run stock
+    checkout). The optional fields start on.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <!--
+            The payment page enforces the storefront's strict script policy
+            (Zero_Core config.xml) instead of only reporting it: PCI DSS 4.0
+            6.4.3 asks that every script on it be authorized. Core does the
+            same for the stock checkout (storefront_checkout_index_index).
+        -->
+        <csp>
+            <mode>
+                <storefront_zero_checkout_index>
+                    <report_only>0</report_only>
+                </storefront_zero_checkout_index>
+            </mode>
+        </csp>
+        <checkout>
+            <zero_checkout>
+                <enabled>1</enabled>
+                <coupon>1</coupon>
+                <order_comment>1</order_comment>
+                <login>1</login>
+                <layout>one_page</layout>
+                <address_autocomplete/>
+                <photon_url>https://photon.komoot.io/api/</photon_url>
+                <google_places_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+            </zero_checkout>
+        </checkout>
+    </default>
+</config>

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+
+    Response of Controller\Checkout\Address: #shipping-address-fields plus
+    shipping methods and totals as out-of-band blocks (isOob).
+-->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <body>
+        <block class="Magento\Framework\View\Element\Template" name="zero.checkout.addressfields" cacheable="false"
+               template="Zero_Checkout::checkout/shipping-address-fields.phtml">
+            <arguments>
+                <argument name="viewModel" xsi:type="object">Zero\Checkout\ViewModel\Checkout\CheckoutPage</argument>
+            </arguments>
+        </block>
+        <block class="Magento\Framework\View\Element\Template" name="zero.checkout.shippingmethods" cacheable="false"
+               template="Zero_Checkout::checkout/shipping-methods.phtml">
+            <arguments>
+                <argument name="viewModel" xsi:type="object">Zero\Checkout\ViewModel\Checkout\CheckoutPage</argument>
+                <argument name="isOob" xsi:type="boolean">true</argument>
+            </arguments>
+        </block>
+        <block class="Magento\Framework\View\Element\Template" name="zero.checkout.ordersummarytotals" cacheable="false"
+               template="Zero_Checkout::checkout/order-summary-totals.phtml">
+            <arguments>
+                <argument name="viewModel" xsi:type="object">Zero\Checkout\ViewModel\Checkout\CheckoutPage</argument>
+                <argument name="isOob" xsi:type="boolean">true</argument>
+            </arguments>
+        </block>
+    </body>
+</layout>

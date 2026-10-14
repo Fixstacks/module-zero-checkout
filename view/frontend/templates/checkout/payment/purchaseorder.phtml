@@ -1,0 +1,28 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * Purchase Order number field. Shown only while the purchaseorder radio is
+ * checked, via the `#payment-methods:has(...) ~ #purchaseorder-fields` rule in
+ * the theme's components.css — so it must stay a sibling of #payment-methods
+ * (the `zero.checkout.payment.forms` container renders without a wrapper).
+ * Not `required`: a hidden required input would block native submit for every
+ * other method; stock Purchaseorder::validate() rejects an empty number.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Zero\Checkout\ViewModel\Checkout\CheckoutPage $viewModel
+ */
+$viewModel = $block->getData('viewModel');
+if (!$viewModel->isPaymentMethodAvailable('purchaseorder')) {
+    return;
+}
+?>
+<div id="purchaseorder-fields" class="rounded-field border border-base-300 p-4">
+    <div class="field required">
+        <label class="label" for="po_number"><?= $escaper->escapeHtml(__('Purchase Order Number')) ?></label>
+        <input type="text" name="po_number" id="po_number" autocomplete="off"
+               class="input input-bordered w-full" />
+    </div>
+</div>

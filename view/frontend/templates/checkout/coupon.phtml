@@ -1,0 +1,66 @@
+<?php
+/**
+ * Copyright © 2026 Roman Pasichnyk
+ * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+ *
+ * Discount code in the order summary (#checkout-coupon; Stores > Configuration
+ * > Zero > Checkout > Discount Code). The field sits inside the checkout form,
+ * so it can't be a form of its own: Apply / Remove are type="button" and
+ * hx-post to zero/checkout/coupon (Controller\Checkout\Coupon), which returns
+ * this block and the totals. Enter in the field applies the code instead of
+ * submitting the order. Needs JavaScript; without it the cart page's discount
+ * box still works.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Zero\Checkout\ViewModel\Checkout\CheckoutPage $viewModel
+ */
+$viewModel = $block->getData('viewModel');
+if (!$viewModel->isCouponEnabled()) {
+    return;
+}
+$appliedCode = (string) $viewModel->getQuote()->getCouponCode();
+$error = $block->getData('couponError');
+$submittedCode = (string) $block->getData('submittedCode');
+$couponUrl = $block->getUrl('zero/checkout/coupon');
+?>
+<div id="checkout-coupon" class="checkout-coupon mb-4 text-sm">
+    <?php if ($appliedCode !== ''): ?>
+        <div class="flex items-center justify-between gap-3">
+            <span>
+                <?= $escaper->escapeHtml(__('Discount code')) ?>
+                <strong class="font-semibold"><?= $escaper->escapeHtml($appliedCode) ?></strong>
+            </span>
+            <button type="button" name="remove" value="1"
+                    hx-post="<?= $escaper->escapeUrl($couponUrl) ?>"
+                    hx-include="[name='form_key'], [name='payment_list_mode'], [name='payment_method']:checked" hx-vals='{"remove": "1"}'
+                    hx-target="#checkout-coupon" hx-swap="outerHTML"
+                    class="link link-neutral text-xs"><?= $escaper->escapeHtml(__('Remove')) ?></button>
+        </div>
+    <?php else: ?>
+        <details<?= $error ? ' open' : '' ?>>
+            <summary class="cursor-pointer underline underline-offset-2">
+                <?= $escaper->escapeHtml(__('Have a discount code?')) ?>
+            </summary>
+            <div class="flex gap-2 mt-2">
+                <label class="sr-only" for="checkout-coupon-code"><?= $escaper->escapeHtml(__('Discount code')) ?></label>
+                <input type="text" name="coupon_code" id="checkout-coupon-code"
+                       value="<?= $escaper->escapeHtmlAttr($submittedCode) ?>"
+                       autocomplete="off" autocapitalize="characters" enterkeyhint="go"
+                       data-enter-clicks
+                       class="input input-bordered input-sm flex-1 min-w-0"
+                       <?= $error ? 'aria-invalid="true" aria-describedby="checkout-coupon-error"' : '' ?> />
+                <button type="button"
+                        hx-post="<?= $escaper->escapeUrl($couponUrl) ?>"
+                        hx-include="#checkout-coupon-code, [name='form_key'], [name='payment_list_mode'], [name='payment_method']:checked"
+                        hx-target="#checkout-coupon" hx-swap="outerHTML"
+                        class="btn btn-outline btn-sm"><?= $escaper->escapeHtml(__('Apply')) ?></button>
+            </div>
+            <?php if ($error): ?>
+                <p id="checkout-coupon-error" class="text-error text-xs mt-1" role="alert">
+                    <?= $escaper->escapeHtml($error) ?>
+                </p>
+            <?php endif; ?>
+        </details>
+    <?php endif; ?>
+</div>

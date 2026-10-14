@@ -1,4 +1,4 @@
-# vilmate/module-zero-checkout — licensing
+# fixstacks/module-zero-checkout — licensing
 
 Copyright © 2026 Roman Pasichnyk.
 

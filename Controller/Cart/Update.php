@@ -21,17 +21,10 @@ use Magento\Framework\View\Result\Layout;
 use Magento\Framework\View\Result\LayoutFactory;
 
 /**
- * Mini-cart qty update / remove (POST from the mini-cart popover). Uses stock
- * Cart::updateItems(), which only touches items of the current quote, so another
- * customer's item id is ignored.
- *
- * CSRF: Magento's automatic check is opted out (CsrfAwareActionInterface) and the
- * form key is validated manually in execute(), same as Placeorder. On an invalid
- * form key nothing is applied and the current cart is re-rendered.
- *
- * Re-renders the same zero.checkout.minicart block as the GET fragment and sends
- * `HX-Trigger: cart:updated`, which refreshes the header cart counter and the
- * mini-cart trigger in place.
+ * Mini-cart qty update / remove. Cart::updateItems() only touches the current
+ * quote's items, so a foreign item id is ignored. The form key is checked in
+ * execute() (CSRF opt-out, as in Placeorder); on a bad key nothing changes.
+ * Re-renders zero.checkout.minicart and sends `HX-Trigger: cart:updated`.
  */
 class Update implements HttpPostActionInterface, CsrfAwareActionInterface
 {

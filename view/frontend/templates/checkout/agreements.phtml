@@ -3,12 +3,9 @@
  * Copyright © 2026 Roman Pasichnyk
  * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
  *
- * Terms and Conditions above Place Order (ViewModel\Checkout\Agreements).
- * Manual agreements are required checkboxes named agreement_ids[]; the server
- * re-checks them (Model\PlaceOrder\AgreementsValidator). Automatic ones are a
- * one-line notice. Each agreement's text opens in a native <details>; its
- * content is admin-authored, rendered as HTML when the agreement says so
- * (as stock checkout does), otherwise escaped.
+ * Terms and Conditions above Place Order: manual ones are required
+ * agreement_ids[] checkboxes (re-checked by AgreementsValidator), automatic
+ * ones a notice. Texts open in a <details>, as HTML when the agreement says so.
  *
  * @var \Magento\Framework\View\Element\Template $block
  * @var \Magento\Framework\Escaper $escaper

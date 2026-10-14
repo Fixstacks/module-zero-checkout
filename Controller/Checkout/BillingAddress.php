@@ -18,16 +18,9 @@ use Zero\Checkout\Model\Checkout\ShippingAddressUpdater;
 use Zero\Core\Controller\PrivateFragmentActionInterface;
 
 /**
- * Saved-address picker (billing) — the billing twin of Controller\Checkout\Address
- * (read that one first). Applies the address via ShippingAddressUpdater::
- * applyBillingFromAddress(); ignores billing_same_as_shipping because the picker
- * only renders while that box is unchecked.
- *
- * Responds with #billing-fields plus #order-summary-totals (hx-swap-oob, in case a
- * store taxes by billing address). No #shipping-methods: billing can't change
- * shipping rates.
- *
- * Security: same customer_id ownership check as Address.
+ * Saved-address picker for billing, the twin of Controller\Checkout\Address
+ * (same ownership check). Re-renders #billing-fields and the totals (a store
+ * may tax by billing address); billing can't change shipping rates.
  */
 class BillingAddress implements PrivateFragmentActionInterface
 {

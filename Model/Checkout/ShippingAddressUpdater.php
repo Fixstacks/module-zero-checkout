@@ -14,20 +14,11 @@ use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address;
 
 /**
- * Applies checkout form address data to the quote. Shared by Controller\Checkout\
- * Shippingmethods (live rate refresh) and Placeorder (final submit) so what's
- * quoted and what's charged come from one implementation.
- *
- * Fields are set with Address::addData() rather than stock's customer_address EAV
- * form; the address entity normalizes/validates them on save either way.
- *
- * Billing is handled separately (applyBilling(), Placeorder only): it can't change
- * shipping rates, so it stays out of the per-keystroke refresh path.
- *
- * Address book: applyCustomerAddress() fills the quote from a saved entry (the
- * picker, and the default shipping address when checkout opens);
- * markAddressBookEntries() runs before placeOrder() so a newly typed address is
- * saved to the customer's book, as stock checkout does.
+ * Applies checkout form addresses to the quote, for both the rate refresh
+ * and Placeorder, so what's quoted is what's charged. Billing is separate
+ * (applyBilling(), Placeorder only). applyCustomerAddress() fills from the
+ * address book; markAddressBookEntries() saves a newly typed address to it,
+ * as stock checkout does.
  */
 class ShippingAddressUpdater
 {

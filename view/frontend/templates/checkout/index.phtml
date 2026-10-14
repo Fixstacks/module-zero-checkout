@@ -3,29 +3,14 @@
  * Copyright © 2026 Roman Pasichnyk
  * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
  *
- * Zero Checkout: one page, one native <form> posting address, shipping method
- * and payment to zero/checkout/placeorder. HTMX only refreshes small regions
- * (regions select, shipping rates + totals, saved-address picker); there is no
- * client-side checkout state.
+ * Zero Checkout: one native <form> posting to zero/checkout/placeorder. HTMX
+ * only refreshes small regions (regions, rates + totals, address picker);
+ * no client-side state. Extension containers: see zero_checkout_index.xml.
  *
- * Extension containers (zero_checkout_index.xml): zero.checkout.login (above
- * the form), zero.checkout.shipping.after (right after the shipping rates, as
- * their siblings), zero.checkout.summary.totals.before (coupon) and
- * zero.checkout.place-order.before (order comment, Terms and Conditions; its
- * fields post with the order).
- *
- * Layout (lg+): addresses | shipping + payment | order summary (sticky; the
- * aside stretches to the row so it has room to stick). The page title comes
- * from the layout; section headings use the sans face like other forms. Payment-method
- * forms come from the zero.checkout.payment.express / .forms containers (see
- * zero_checkout_index.xml); card panels toggle via CSS :has() on
- * #payment-methods, so they must stay its siblings.
- *
- * Address fields wired to #shipping-methods share hx-sync="#shipping-methods:
- * replace" so a newer edit aborts an older in-flight request (a slow response
- * could otherwise overwrite newer rates and the picked method). The region
- * field fires on zero:session-ready rather than load, so a first-time visitor's
- * session exists before rates are computed against its quote.
+ * Card panels toggle via CSS :has() on #payment-methods: keep them siblings.
+ * Address fields share hx-sync="#shipping-methods:replace", so a newer edit
+ * aborts an older request. The region field fires on zero:session-ready, so
+ * a first-time visitor's session exists before rates are computed.
  *
  * @var \Magento\Framework\Escaper $escaper
  * @var \Zero\Checkout\ViewModel\Checkout\CheckoutPage $viewModel

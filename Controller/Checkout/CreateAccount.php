@@ -26,16 +26,11 @@ use Magento\Sales\Model\Order\OrderCustomerExtractor;
 use Psr\Log\LoggerInterface;
 
 /**
- * "Create an account" on the order success page, in one step: the guest
- * picks a password there, the account is made from the order (name, email,
- * its addresses), the order is attached to it, and the customer is signed
- * in and sent to the order. Stock links to a separate registration form
- * instead (checkout/account/delegateCreate).
- *
- * Only for the session's last order, placed as a guest, whose email has no
- * account yet, while registration is allowed: the same rules as the prompt
- * (Magento\Checkout\Block\Registration). HTMX posts get the prompt back with
- * the error, or an HX-Redirect; a plain form post is redirected either way.
+ * "Create an account" on the success page in one step: the guest picks a
+ * password, the account is made from the order and gets it, and the customer
+ * is signed in. Only for the session's last guest order whose email has no
+ * account, with registration allowed (Magento\Checkout\Block\Registration's
+ * rules). HTMX gets the prompt back or an HX-Redirect.
  */
 class CreateAccount implements HttpPostActionInterface
 {

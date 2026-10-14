@@ -14,16 +14,12 @@ use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Psr\Log\LoggerInterface;
 
 /**
- * What a payment on the provider's own page does to the order once the
- * provider has answered (Zero_Monobank, Zero_LiqPay, Zero_Mollie,
- * Zero_PaypalCheckout, Zero_Klarna, Zero_Adyen): the order waited in
- * pending_payment, and now it is
- * - captured: paid; an invoice is registered (Magento's capture notification);
- * - authorized: the money is reserved and taken later (Klarna, Adyen with
- *   manual capture); the order is processing without an invoice;
+ * What a provider's answer does to an order that waited in pending_payment
+ * (Monobank, LiqPay, Mollie, PayPal, Klarna, Adyen):
+ * - captured: paid, invoice registered;
+ * - authorized: reserved, captured later; processing without an invoice;
  * - cancelled.
- * Captured and authorized send the order email, which waited for the payment.
- * Each is done once: settled() tells whether the order is past waiting.
+ * Captured and authorized send the order email. Each is done once (settled()).
  */
 class OrderPayment
 {

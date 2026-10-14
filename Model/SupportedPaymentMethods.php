@@ -11,8 +11,8 @@ namespace Zero\Checkout\Model;
 use Zero\Checkout\ViewModel\Checkout\CheckoutPage;
 
 /**
- * Payment methods Zero Checkout lists and accepts on submit: the built-in ones
- * (CheckoutPage::SUPPORTED_METHODS) plus any a module registers in di.xml:
+ * Payment methods Zero Checkout lists and accepts: the built-in ones
+ * (CheckoutPage::SUPPORTED_METHODS) plus any registered in di.xml:
  *
  *     <type name="Zero\Checkout\Model\SupportedPaymentMethods">
  *         <arguments>
@@ -22,9 +22,8 @@ use Zero\Checkout\ViewModel\Checkout\CheckoutPage;
  *         </arguments>
  *     </type>
  *
- * The item name is the payment method code; the value is the one-line
- * description under its title ('' for none). The method must still be enabled
- * and available (Sales > Payment Methods) to appear.
+ * Item name = method code, value = the line under its title ('' for none).
+ * The method must still be enabled and available.
  */
 class SupportedPaymentMethods
 {

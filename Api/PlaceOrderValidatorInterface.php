@@ -12,15 +12,11 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
 
 /**
- * A check Zero Checkout runs before it places the order, after the addresses,
- * shipping method and payment from the form are on the quote. Register an
- * implementation in di.xml on Zero\Checkout\Controller\Checkout\Placeorder's
- * `validators` argument; throw LocalizedException to stop the order, and its
- * message is shown to the shopper on the checkout page.
- *
- * The request is the raw POST of the checkout form, so a module that adds its
- * own field to the form (layout container zero.checkout.place-order.before)
- * reads it here.
+ * A check run before Zero Checkout places the order (the form's addresses,
+ * shipping and payment are already on the quote). Add it to Placeorder's
+ * `validators` in di.xml; a LocalizedException stops the order and its
+ * message is shown. The request is the checkout form's raw POST, so fields
+ * added in zero.checkout.place-order.before can be read here.
  */
 interface PlaceOrderValidatorInterface
 {

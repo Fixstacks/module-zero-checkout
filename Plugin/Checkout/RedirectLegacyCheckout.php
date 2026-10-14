@@ -14,18 +14,10 @@ use Magento\Framework\Controller\Result\RedirectFactory;
 use Zero\Checkout\Model\Config;
 
 /**
- * Sends stock's checkout route (checkout/index/index, the Knockout checkout) to
- * Zero Checkout, so old bookmarks and hand-typed /checkout/ URLs don't land on a
- * page this theme can't run.
- *
- * A plugin rather than a controller override: stock's own checks (empty cart,
- * guest checkout disabled, minimum amount) still run first, and only a page it
- * would actually render is replaced by the redirect.
- *
- * With Zero Checkout switched off (Model\Config::isEnabled()) this does nothing,
- * and stock's unmodified checkout is the fallback. Only stock payment methods
- * work there — Zero's own methods have no Knockout renderer (see
- * Observer\HideZeroPaymentMethodsOnStockCheckout).
+ * Sends stock's Knockout checkout (checkout/index/index) to Zero Checkout. A
+ * plugin, so stock's own checks (empty cart, guest checkout, minimum amount)
+ * still run first. With Zero Checkout off it does nothing; Zero's payment
+ * methods are then hidden there (Observer\HideZeroPaymentMethodsOnStockCheckout).
  */
 class RedirectLegacyCheckout
 {

@@ -3,11 +3,8 @@
  * Copyright © 2026 Roman Pasichnyk
  * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
  *
- * "Already have an account? Sign in" for guests, above the checkout form
- * (Stores > Configuration > Zero > Checkout > Sign In at Checkout). Its own
- * <form>, outside the checkout one, posting to zero/checkout/login, which
- * hands over to core's customer/account/loginPost (captcha, lockout, cart
- * merge) and brings the shopper back here signed in.
+ * "Already have an account? Sign in" above the checkout form: its own form,
+ * posting to zero/checkout/login (core loginPost, then back here).
  *
  * @var \Magento\Framework\View\Element\Template $block
  * @var \Magento\Framework\Escaper $escaper

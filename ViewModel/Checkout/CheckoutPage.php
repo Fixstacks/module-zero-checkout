@@ -31,14 +31,9 @@ use Zero\Checkout\Model\Config;
 use Zero\Checkout\Model\SupportedPaymentMethods;
 
 /**
- * View model for Zero Checkout's one-page checkout: quote, addresses, saved
- * address book, countries/regions, shipping rates, totals and the payment
- * method list. Shipping rates and the country → region select are refreshed as
- * HTMX fragments (Controller\Checkout\Shippingmethods, Zero_Core's
- * checkout/regions).
- *
- * Payment-method forms that need their own config (Stripe, Authorize.Net) live
- * in their own modules and only ask this class isPaymentMethodAvailable().
+ * Zero Checkout's page data: quote, addresses, address book, countries and
+ * regions, shipping rates, totals and payment methods. Modules with their own
+ * payment forms (Stripe, Authorize.Net) only ask isPaymentMethodAvailable().
  */
 class CheckoutPage implements ArgumentInterface
 {

@@ -18,15 +18,10 @@ use Magento\Framework\Url\EncoderInterface;
 use Magento\Framework\UrlInterface;
 
 /**
- * "Sign in" from the checkout page (checkout/login.phtml). Doesn't log in
- * itself: it points the post-login redirect back at checkout and forwards the
- * POST to core's customer/account/loginPost, which keeps captcha, lockout,
- * the form-key check, the customer_login event and the guest-cart merge.
- *
- * Both of core's redirect paths are covered: the `referer` parameter (used
- * when "Redirect Customer to Account Dashboard after Logging in" is No) and
- * the session's after-auth URL (used when it's Yes). A failed login lands on
- * core's sign-in page with its message; signing in there still returns here.
+ * "Sign in" from the checkout page: sets the post-login redirect to checkout
+ * (both the `referer` parameter and the session's after-auth URL) and forwards
+ * to core's customer/account/loginPost, which keeps captcha, lockout, form key,
+ * customer_login and the cart merge.
  */
 class Login implements HttpPostActionInterface
 {

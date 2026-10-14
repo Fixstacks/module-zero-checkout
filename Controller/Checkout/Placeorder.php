@@ -28,22 +28,15 @@ use Zero\Checkout\Model\Checkout\ShippingAddressUpdater;
 use Zero\Checkout\Model\SupportedPaymentMethods;
 
 /**
- * Final submit of Zero Checkout (POST). Applies shipping/billing address via
- * ShippingAddressUpdater (the same code the live rate refresh uses), sets the
- * shipping and payment method, then places the order with stock
- * CartManagementInterface::placeOrder() and redirects to stock's
- * checkout/onepage/success (whose SuccessValidator needs the last_* session ids
- * set below, mirroring stock Onepage::saveOrder()).
+ * Final submit of Zero Checkout (POST): applies the addresses
+ * (ShippingAddressUpdater, as the rate refresh does), shipping and payment,
+ * places the order with CartManagementInterface::placeOrder() and redirects to
+ * checkout/onepage/success (the last_* session ids are set as Onepage does).
+ * The form key is checked in execute(). A method with an off-site step leaves
+ * a REDIRECT_URL on the payment.
  *
- * CSRF: automatic check opted out, form key validated manually in execute().
- * Payment methods that need an off-site step leave a redirect URL on the order
- * payment (REDIRECT_URL); this class doesn't know which method that is.
- *
- * Extension points (di.xml arguments, see Api/ and README.md): `validators`
- * (PlaceOrderValidatorInterface) run once the form's addresses, shipping and
- * payment are on the quote and can stop the order with a message;
- * `afterPlaceOrder` (AfterPlaceOrderInterface) run once it exists, and their
- * failures are only logged.
+ * Extension points (di.xml, see Api/ and README.md): `validators` can stop the
+ * order with a message; `afterPlaceOrder` runs after it, failures only logged.
  */
 class Placeorder implements HttpPostActionInterface, CsrfAwareActionInterface
 {

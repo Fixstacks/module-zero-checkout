@@ -10,14 +10,16 @@ Offline payment methods work with JavaScript turned off.
 Requires Magento Open Source 2.4.7–2.4.9 and PHP 8.2–8.4.
 
 ```bash
-composer require vilmate/module-zero-checkout
+composer require fixstacks/module-zero-checkout
 bin/magento setup:upgrade
 bin/magento setup:di:compile           # production mode
 bin/magento setup:static-content:deploy # production mode
 bin/magento cache:flush
 ```
 
-Composer installs `vilmate/module-zero-core` with it.
+Composer installs `fixstacks/module-zero-core` with it.
+
+Part of [`fixstacks/zero`](https://fixstacks.com/zero), which installs the Zero theme and every Zero module at once.
 
 ## Features
 
@@ -195,3 +197,12 @@ script and one layout file.
   rate request winning.
 - `form_key` is in the form; HTMX posts include it with
   `hx-include="[name='form_key']"`.
+
+## License
+
+OSL-3.0 or AFL-3.0, your choice: see `NOTICE.md`.
+
+---
+
+Zero is made by [Fixstacks](https://fixstacks.com/zero) in partnership with [Vilmate](https://vilmate.com).
+Documentation: https://fixstacks.com/zero/docs. Demo store: https://zero.fixstacks.com.

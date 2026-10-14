@@ -18,17 +18,10 @@ use Zero\Checkout\Model\Checkout\ShippingAddressUpdater;
 use Zero\Core\Controller\PrivateFragmentActionInterface;
 
 /**
- * Saved-address picker (shipping): applies one of the logged-in customer's
- * address-book entries to the quote via ShippingAddressUpdater::apply().
- *
- * Responds with three blocks: #shipping-address-fields (the picker's hx-target)
- * plus #shipping-methods and #order-summary-totals as hx-swap-oob, since a new
- * address can change rates and totals.
- *
- * Security: AddressRepositoryInterface::getById() loads any address by id, so
- * the address's customer_id must match the session customer before anything is
- * applied. A mismatch (someone else's id, guest, deleted id) is silently ignored
- * and the current state is re-rendered.
+ * Saved-address picker: applies one of the customer's addresses to the quote
+ * and re-renders the fields, plus shipping methods and totals (hx-swap-oob).
+ * getById() loads any address, so one not owned by the session customer is
+ * ignored.
  */
 class Address implements PrivateFragmentActionInterface
 {

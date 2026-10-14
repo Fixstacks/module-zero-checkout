@@ -3,13 +3,10 @@
  * Copyright © 2026 Roman Pasichnyk
  * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
  *
- * Discount code in the order summary (#checkout-coupon; Stores > Configuration
- * > Zero > Checkout > Discount Code). The field sits inside the checkout form,
- * so it can't be a form of its own: Apply / Remove are type="button" and
- * hx-post to zero/checkout/coupon (Controller\Checkout\Coupon), which returns
- * this block and the totals. Enter in the field applies the code instead of
- * submitting the order. Needs JavaScript; without it the cart page's discount
- * box still works.
+ * Discount code in the order summary. It's inside the checkout form, so Apply
+ * and Remove are buttons that hx-post to zero/checkout/coupon (this block and
+ * the totals come back); Enter applies instead of placing the order. Without
+ * JavaScript the cart page's discount box still works.
  *
  * @var \Magento\Framework\View\Element\Template $block
  * @var \Magento\Framework\Escaper $escaper

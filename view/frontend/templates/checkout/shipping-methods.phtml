@@ -3,14 +3,10 @@
  * Copyright © 2026 Roman Pasichnyk
  * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
  *
- * Shipping rate radio list (#shipping-methods), rendered inline and as the
- * zero/checkout/shippingmethods response; `isOob` renders it as an hx-swap-oob
- * fragment (used by Controller\Checkout\Address).
- *
- * Each radio hx-gets the endpoint itself on change, so the server learns the
- * choice immediately. Relying on a later address-field request was racy: a
- * field's blur-triggered change can fire with the old radio still checked.
- * hx-sync matches the address fields' group so the newest request wins.
+ * Shipping rate radios (#shipping-methods), inline, as the shippingmethods
+ * response, or out of band (`isOob`). Each radio hx-gets on change, since a
+ * field's blur could otherwise send the old choice; hx-sync shares the
+ * address fields' group so the newest request wins.
  *
  * @var \Magento\Framework\Escaper $escaper
  * @var \Zero\Checkout\ViewModel\Checkout\CheckoutPage $viewModel

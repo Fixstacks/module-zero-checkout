@@ -9,3 +9,14 @@
 
 /* Added by web/js/checkout-steps.js, not in any template. */
 @source inline("step-primary");
+
+/* The Purchase Order field (checkout/payment/purchaseorder.phtml): shown by a `:has()` rule on the payment method radios. */
+@layer components {
+    #purchaseorder-fields {
+        display: none;
+    }
+
+    #payment-methods:has(input[value="purchaseorder"]:checked) ~ #purchaseorder-fields {
+        display: block;
+    }
+}

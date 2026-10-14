@@ -16,19 +16,13 @@ use Magento\Framework\View\Result\LayoutFactory;
 use Zero\Checkout\Model\Checkout\ShippingAddressUpdater;
 
 /**
- * HTMX shipping-rate refresh: every address field hx-gets this endpoint on change
- * (hx-include = the whole form), so the address is re-applied to the quote via
- * the same ShippingAddressUpdater Placeorder uses and fresh rates come back.
- * Responds with #shipping-methods plus #order-summary-totals (hx-swap-oob).
- *
- * Two non-obvious bits in execute(), both in-memory only (Placeorder is what
- * persists a choice):
- * - The submitted shipping_method is re-applied when the new address still
- *   offers it; otherwise every address edit would silently reset the radio to
- *   the first rate (ShippingAddressUpdater only handles address fields).
- * - setTotalsCollectedFlag(false) before collectTotals(): apply() already
- *   collected totals once, and Quote::collectTotals() returns early while that
- *   flag is set — without it the total never includes shipping.
+ * HTMX shipping-rate refresh: address fields hx-get this with the whole form;
+ * the address is applied as Placeorder does and #shipping-methods plus the
+ * totals (hx-swap-oob) come back. In memory only:
+ * - the posted shipping_method is kept when still offered, or each edit would
+ *   reset the radio to the first rate;
+ * - setTotalsCollectedFlag(false) before collectTotals(): apply() collected
+ *   once already, and the flag would leave shipping out of the total.
  */
 class Shippingmethods implements PrivateFragmentActionInterface
 {

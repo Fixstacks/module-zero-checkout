@@ -3,12 +3,9 @@
  * Copyright © 2026 Roman Pasichnyk
  * SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
  *
- * Billing address fields (#billing-fields), rendered inline and as the
- * Controller\Checkout\BillingAddress response. Reads the quote's billing address
- * itself, so after a saved address is applied it simply re-renders.
- *
- * The saved-address picker sits inside the fieldset, so it hides together with
- * it while "Same as shipping" is checked.
+ * Billing address fields (#billing-fields), inline and as the BillingAddress
+ * response. The picker is inside the fieldset, so it hides with it while
+ * "Same as shipping" is checked.
  *
  * @var \Magento\Framework\Escaper $escaper
  * @var \Zero\Checkout\ViewModel\Checkout\CheckoutPage $viewModel

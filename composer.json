@@ -2,7 +2,7 @@
     "name": "fixstacks/module-zero-checkout",
     "description": "Zero for Magento Open Source: a one-page checkout without Knockout: server-rendered HTML, one native form, HTMX for the parts that refresh.",
     "type": "magento2-module",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "license": [
         "OSL-3.0",
         "AFL-3.0"

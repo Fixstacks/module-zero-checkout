@@ -72,6 +72,8 @@ class Coupon implements HttpPostActionInterface
         }
         $layout->addOutputElement(self::COUPON_BLOCK_NAME);
         $layout->addOutputElement(self::TOTALS_BLOCK_NAME);
+        // The cart's totals changed: the mini-cart and other fragments of the cart refetch.
+        $resultLayout->setHeader('HX-Trigger', 'cart:updated');
 
         return $resultLayout;
     }

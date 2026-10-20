@@ -32,6 +32,7 @@
                 <address_autocomplete/>
                 <photon_url>https://photon.komoot.io/api/</photon_url>
                 <google_places_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                <webhook_queue>0</webhook_queue>
             </zero_checkout>
         </checkout>
     </default>

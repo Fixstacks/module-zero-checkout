@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+
+    Payment Webhooks > Process Through the Queue: the message is the verified
+    webhook ({"order_id": 12, "method": "zero_mollie", "data": {...}, "attempt": 1}).
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Communication/etc/communication.xsd">
+    <topic name="zero.checkout.webhook" request="string">
+        <handler name="zero_checkout_webhook" type="Zero\Checkout\Model\RedirectPayment\WebhookConsumer" method="process"/>
+    </topic>
+</config>

@@ -47,9 +47,29 @@ Stores > Configuration > **Zero** > **Checkout**:
 | Checkout Page | Order Comment | `checkout/zero_checkout/order_comment` | Yes |
 | Checkout Page | Sign In at Checkout | `checkout/zero_checkout/login` | Yes |
 | Terms and Conditions | Enable Terms and Conditions | `checkout/options/enable_agreements` (Magento's) | No |
+| Payment Webhooks | Process Through the Queue | `checkout/zero_checkout/webhook_queue` | No |
 
 The agreements are edited in Stores > Terms and Conditions. Payment methods
 are configured in Sales > Payment Methods.
+
+**Payment webhooks through the queue.** Mollie, Klarna, Adyen, monobank and
+LiqPay tell the store about a payment with a webhook or callback. The
+controller checks that the call is the provider's and about one of its orders
+(signature, the order's own payment id), then hands it to
+`Model\RedirectPayment\Webhooks`: with the setting off, the handler runs while
+the provider waits for the answer (503 when the provider can't be asked, so it
+calls again); with it on, the call is published to the topic
+`zero.checkout.webhook` and answered at once, and the consumer of the same name
+runs the handler. Magento's queue framework carries it: RabbitMQ when
+`env.php` has `queue/amqp`, the `queue_message` table otherwise. Cron starts
+the consumer (`cron_consumers_runner`, on by default); it can also run on its
+own: `bin/magento queue:consumers:start zero.checkout.webhook`. When the
+provider can't be asked from the consumer, the call goes back in the queue
+after a pause, five tries in all, then the order gets a comment and keeps
+waiting. Each payment module registers its handler
+(`Model\RedirectPayment\WebhookHandlerInterface`) by method code in its
+`di.xml`; a module adding a redirect payment does the same. Run
+`bin/magento setup:upgrade` after installing: it creates the queue.
 
 ## Extending the checkout
 

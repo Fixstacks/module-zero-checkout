@@ -26,6 +26,7 @@ class Config
     public const LAYOUT_ONE_PAGE = 'one_page';
     public const LAYOUT_STEPS = 'steps';
     public const XML_PATH_ADDRESS_AUTOCOMPLETE = 'checkout/zero_checkout/address_autocomplete';
+    public const XML_PATH_WEBHOOK_QUEUE = 'checkout/zero_checkout/webhook_queue';
     /** Magento's own: Customers > Customer Configuration > Name and Address Options > Show Company. */
     public const XML_PATH_COMPANY_SHOW = 'customer/address/company_show';
     /** Magento's own: Customers > Customer Configuration > Create New Account Options > Show VAT Number on Storefront. */
@@ -46,6 +47,14 @@ class Config
     }
 
     /** Discount code field in the order summary. */
+    /**
+     * Payment Webhooks > Process Through the Queue (RedirectPayment\Webhooks).
+     */
+    public function isWebhookQueued(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_WEBHOOK_QUEUE);
+    }
+
     public function isCouponEnabled(int|string|null $storeId = null): bool
     {
         return $this->scopeConfig->isSetFlag(self::XML_PATH_COUPON, ScopeInterface::SCOPE_STORE, $storeId);

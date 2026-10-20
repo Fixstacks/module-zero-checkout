@@ -92,6 +92,16 @@
                 <label>Payment Methods</label>
                 <comment>Payment methods are set up where Magento keeps them: Sales > Payment Methods (Stripe, Braintree, Authorize.Net and PayPal for Zero Checkout are there too).</comment>
             </group>
+            <group id="webhooks" translate="label comment" type="text" sortOrder="50" showInDefault="1">
+                <label>Payment Webhooks</label>
+                <comment>Mollie, Klarna, Adyen, monobank and LiqPay tell the store about a payment with a webhook or callback. The store checks that the call is the provider's and about one of its orders, then brings the order in line with the provider.</comment>
+                <field id="webhook_queue" translate="label comment" type="select" sortOrder="10" showInDefault="1" canRestore="1">
+                    <label>Process Through the Queue</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>checkout/zero_checkout/webhook_queue</config_path>
+                    <comment><![CDATA[Yes: the provider gets its answer at once; the consumer <code>zero.checkout.webhook</code>, which cron starts, updates the order (through RabbitMQ when env.php has <code>queue/amqp</code>, through the database queue otherwise; when the provider can't be asked, five tries, then a comment on the order). No: the order is updated while the provider waits for the answer.]]></comment>
+                </field>
+            </group>
         </section>
     </system>
 </config>

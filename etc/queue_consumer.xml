@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+
+    Started by cron (cron_consumers_runner in env.php, on by default), or by
+    hand: bin/magento queue:consumers:start zero.checkout.webhook
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
+    <consumer name="zero.checkout.webhook" queue="zero.checkout.webhook" handler="Zero\Checkout\Model\RedirectPayment\WebhookConsumer::process"/>
+</config>

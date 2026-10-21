@@ -1,4 +1,4 @@
-# fixstacks/module-zero-checkout — licensing
+# zerofront/module-zero-checkout — licensing
 
 Copyright © 2026 Roman Pasichnyk.
 
